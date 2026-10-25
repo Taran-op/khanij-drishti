@@ -1,0 +1,194 @@
+{
+  "name": "Production shortfall forecaster",
+  "algorithm": "Histogram gradient boosting (driver model) \u00b7 P10/P50/P90 quantile heads",
+  "champion": "gbm",
+  "champion_version": "gbm-20261013-142758920",
+  "leaderboard": [
+    {
+      "name": "gbm",
+      "algorithm": "Histogram gradient boosting (driver model) \u00b7 P10/P50/P90 quantile heads",
+      "version": "gbm-20261013-142758920",
+      "champion": true,
+      "mape_30d": 11.31,
+      "rel_rmse_30d": 0.1477,
+      "daily_mae_t": 106.4,
+      "beats_naive": true,
+      "coverage_calibrated": 0.639
+    },
+    {
+      "name": "lstm",
+      "algorithm": "Seq2seq LSTM (PyTorch, 48 units): 28-day encoder + driver decoder \u00b7 pinball loss P10/P50/P90",
+      "version": "lstm-20261013-142822411",
+      "champion": false,
+      "mape_30d": 12.15,
+      "rel_rmse_30d": 0.1518,
+      "daily_mae_t": 109.0,
+      "beats_naive": false,
+      "coverage_calibrated": 0.615
+    },
+    {
+      "name": "prophet",
+      "algorithm": "Prophet per mine: trend + yearly/weekly seasonality + 7 driver regressors \u00b7 residual-quantile P10/P90",
+      "version": "prophet-20261013-142825702",
+      "champion": false,
+      "mape_30d": 13.03,
+      "rel_rmse_30d": 0.1562,
+      "daily_mae_t": 110.4,
+      "beats_naive": false,
+      "coverage_calibrated": 0.617
+    },
+    {
+      "name": "seasonal_naive",
+      "algorithm": "Same window last year x 90-day trend (baseline)",
+      "version": null,
+      "champion": false,
+      "mape_30d": 11.41,
+      "daily_mae_t": 135.5
+    }
+  ],
+  "baseline": "Seasonal naive (same window last year \u00d7 90-day trend)",
+  "backtest": {
+    "origins": [
+      "2026-04-01",
+      "2026-05-01",
+      "2026-06-01",
+      "2026-07-01",
+      "2026-08-01",
+      "2026-09-01"
+    ],
+    "horizon_days": 30,
+    "model_mape_30d": 11.31,
+    "naive_mape_30d": 11.41,
+    "rel_rmse_30d": 0.1477,
+    "model_daily_mae_t": 106.4,
+    "naive_daily_mae_t": 135.5,
+    "per_origin": [
+      {
+        "origin": "2026-04-01",
+        "gbm_ape": 4.85,
+        "lstm_ape": 10.51,
+        "prophet_ape": 7.88,
+        "naive_ape": 7.43,
+        "model_ape": 4.85
+      },
+      {
+        "origin": "2026-05-01",
+        "gbm_ape": 7.68,
+        "lstm_ape": 8.9,
+        "prophet_ape": 8.32,
+        "naive_ape": 5.27,
+        "model_ape": 7.68
+      },
+      {
+        "origin": "2026-06-01",
+        "gbm_ape": 9.26,
+        "lstm_ape": 10.0,
+        "prophet_ape": 9.74,
+        "naive_ape": 13.53,
+        "model_ape": 9.26
+      },
+      {
+        "origin": "2026-07-01",
+        "gbm_ape": 11.43,
+        "lstm_ape": 11.38,
+        "prophet_ape": 16.93,
+        "naive_ape": 12.29,
+        "model_ape": 11.43
+      },
+      {
+        "origin": "2026-08-01",
+        "gbm_ape": 10.51,
+        "lstm_ape": 11.01,
+        "prophet_ape": 15.26,
+        "naive_ape": 14.17,
+        "model_ape": 10.51
+      },
+      {
+        "origin": "2026-09-01",
+        "gbm_ape": 24.14,
+        "lstm_ape": 21.08,
+        "prophet_ape": 20.03,
+        "naive_ape": 15.75,
+        "model_ape": 24.14
+      }
+    ]
+  },
+  "driver_fit": {
+    "window": "last 120 days, true drivers (GBM)",
+    "r2_within_mine": 0.263,
+    "p10_p90_coverage": 0.347
+  },
+  "intervals": {
+    "method": "Conformalized quantile regression (CQR): daily band widened by the 80th percentile of out-of-band errors on a held-out window; coverage measured on the following 60 days",
+    "interval_widen_util": 0.1312,
+    "coverage_raw": 0.284,
+    "coverage_calibrated": 0.639
+  },
+  "explanation_model": "gradient boosting (driver importance is computed on the GBM for every champion)",
+  "importance": [
+    {
+      "feature": "Equipment availability",
+      "value": 0.357
+    },
+    {
+      "feature": "Trend",
+      "value": 0.2475
+    },
+    {
+      "feature": "Ground wetness",
+      "value": 0.0847
+    },
+    {
+      "feature": "Dumper fleet",
+      "value": 0.0811
+    },
+    {
+      "feature": "Season",
+      "value": 0.0763
+    },
+    {
+      "feature": "Mine",
+      "value": 0.0502
+    },
+    {
+      "feature": "Manpower",
+      "value": 0.0423
+    },
+    {
+      "feature": "Blasting",
+      "value": 0.0351
+    },
+    {
+      "feature": "Rainfall",
+      "value": 0.022
+    },
+    {
+      "feature": "Rainfall (prev day)",
+      "value": 0.0034
+    },
+    {
+      "feature": "Opencast",
+      "value": 0.0003
+    },
+    {
+      "feature": "Festival",
+      "value": 0.0
+    }
+  ],
+  "rows": 8280,
+  "features": [
+    "mine_code",
+    "is_opencast",
+    "doy_sin",
+    "doy_cos",
+    "t_years",
+    "rain_mm",
+    "rain_prev",
+    "api",
+    "excavator_avail",
+    "fleet_ratio",
+    "manpower_ratio",
+    "blasts",
+    "festival"
+  ]
+}

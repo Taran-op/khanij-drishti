@@ -1,0 +1,48 @@
+{
+  "algorithm": "Mean of random_forest, xgboost, unet",
+  "metrics": {
+    "cv_auc": 0.777,
+    "pr_auc": 0.304,
+    "occ_auc": 0.974,
+    "occ_auc_far": 0.952,
+    "hit_rate": 0.62,
+    "background_flag_rate": 0.006,
+    "gen_score": 0.865
+  },
+  "occurrence_check": {
+    "n_occurrences": 50,
+    "auc": 0.974,
+    "auc_far": 0.952,
+    "n_far": 25,
+    "hit_rate": 0.62,
+    "threshold": 0.5,
+    "background_flag_rate": 0.006,
+    "by_distance": [
+      {
+        "band": "0\u20133 km",
+        "n": 10,
+        "auc": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "band": "3\u20136 km",
+        "n": 15,
+        "auc": 0.994,
+        "hit_rate": 0.8
+      },
+      {
+        "band": "6\u201310 km",
+        "n": 15,
+        "auc": 0.995,
+        "hit_rate": 0.6
+      },
+      {
+        "band": ">10 km",
+        "n": 10,
+        "auc": 0.889,
+        "hit_rate": 0.0
+      }
+    ],
+    "note": "USGS MRDS 'Occurrence' sites were held out of training. AUC compares the model's score at those sites (3\u00d73 max, MRDS positions are rounded) with background cells >6 km from any recorded site."
+  }
+}

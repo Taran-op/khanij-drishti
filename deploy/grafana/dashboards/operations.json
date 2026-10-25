@@ -1,0 +1,14 @@
+{
+  "annotations":{"list":[]},"editable":true,
+  "panels":[
+    {"type":"stat","title":"API requests (5m)","gridPos":{"h":8,"w":6,"x":0,"y":0},"targets":[{"expr":"sum(increase(kd_http_requests_total[5m]))","refId":"A"}]},
+    {"type":"stat","title":"DB ready","gridPos":{"h":8,"w":6,"x":6,"y":0},"targets":[{"expr":"kd_database_up","refId":"A"}]},
+    {"type":"stat","title":"Dead letters","gridPos":{"h":8,"w":6,"x":12,"y":0},"targets":[{"expr":"kd_ingest_dead_letter","refId":"A"}]},
+    {"type":"stat","title":"Fleet availability","gridPos":{"h":8,"w":6,"x":18,"y":0},"targets":[{"expr":"kd_fleet_available_ratio","refId":"A"}]},
+    {"type":"timeseries","title":"Request latency","gridPos":{"h":9,"w":12,"x":0,"y":8},"targets":[{"expr":"rate(kd_http_request_duration_seconds_sum[5m]) / clamp_min(rate(kd_http_request_duration_seconds_count[5m]), 0.001)","legendFormat":"mean seconds","refId":"A"}]},
+    {"type":"timeseries","title":"Forecast MAE and drift PSI","gridPos":{"h":9,"w":12,"x":12,"y":8},"targets":[{"expr":"kd_forecast_live_mae_t","legendFormat":"live MAE","refId":"A"},{"expr":"kd_feature_psi","legendFormat":"PSI {{feature}}","refId":"B"}]}
+  ],
+  "refresh":"30s","schemaVersion":39,"tags":["khanij-drishti","production"],
+  "templating":{"list":[]},"time":{"from":"now-6h","to":"now"},"timezone":"browser",
+  "title":"KhanijDrishti Operations","uid":"khanij-operations","version":1
+}

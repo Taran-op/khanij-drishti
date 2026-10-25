@@ -1,0 +1,18 @@
+{
+  "algorithm": "Seq2seq LSTM (PyTorch, 48 units): 28-day encoder + driver decoder \u00b7 pinball loss P10/P50/P90",
+  "metrics": {
+    "mape_30d": 12.15,
+    "rel_rmse_30d": 0.1518,
+    "daily_mae_t": 109.0,
+    "beats_naive": false,
+    "naive_mape_30d": 11.41
+  },
+  "origins": [
+    "2026-04-01",
+    "2026-05-01",
+    "2026-06-01",
+    "2026-07-01",
+    "2026-08-01",
+    "2026-09-01"
+  ]
+}

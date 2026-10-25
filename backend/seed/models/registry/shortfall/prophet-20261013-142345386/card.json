@@ -1,0 +1,18 @@
+{
+  "algorithm": "Prophet per mine: trend + yearly/weekly seasonality + 7 driver regressors \u00b7 residual-quantile P10/P90",
+  "metrics": {
+    "mape_30d": 13.03,
+    "rel_rmse_30d": 0.1562,
+    "daily_mae_t": 110.4,
+    "beats_naive": false,
+    "naive_mape_30d": 11.41
+  },
+  "origins": [
+    "2026-04-01",
+    "2026-05-01",
+    "2026-06-01",
+    "2026-07-01",
+    "2026-08-01",
+    "2026-09-01"
+  ]
+}

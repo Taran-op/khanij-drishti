@@ -1,0 +1,21 @@
+{
+  "algorithm": "Histogram gradient boosting (driver model) \u00b7 P10/P50/P90 quantile heads",
+  "metrics": {
+    "mape_30d": 11.31,
+    "rel_rmse_30d": 0.1477,
+    "daily_mae_t": 106.4,
+    "beats_naive": true,
+    "coverage_calibrated": 0.639,
+    "naive_mape_30d": 11.41,
+    "interval_widen_util": 0.1312,
+    "coverage_raw": 0.284
+  },
+  "origins": [
+    "2026-04-01",
+    "2026-05-01",
+    "2026-06-01",
+    "2026-07-01",
+    "2026-08-01",
+    "2026-09-01"
+  ]
+}

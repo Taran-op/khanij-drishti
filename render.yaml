@@ -1,0 +1,46 @@
+databases:
+  - name: khanij-drishti-db
+    databaseName: khanij
+    user: khanij
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: khanij-drishti-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: KD_DATABASE_URL
+        fromDatabase:
+          name: khanij-drishti-db
+          property: connectionString
+      - key: KD_TOKEN_SECRET
+        generateValue: true
+      - key: KD_BOOTSTRAP_ADMIN_USERNAME
+        value: taran
+      - key: KD_BOOTSTRAP_ADMIN_NAME
+        value: Taran
+      - key: KD_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+      - key: KD_ALLOWED_ORIGINS
+        value: https://frontend-one-theta-32.vercel.app
+      - key: KD_DEMO_LOGIN
+        value: "0"
+      - key: KD_WORKER
+        value: inprocess
+      - key: KD_SCHEDULER
+        value: "1"
+      - key: KD_LIVE_FEED
+        value: "0"
+      - key: KD_VIRTUAL_MINE
+        value: "0"
+      - key: KD_DATA_DIR
+        value: /var/lib/khanij-drishti/data
+      - key: KD_MODELS_DIR
+        value: /var/lib/khanij-drishti/models

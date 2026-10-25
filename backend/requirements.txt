@@ -1,0 +1,25 @@
+numpy>=2.0
+pandas>=2.2
+scikit-learn>=1.5
+scipy>=1.13
+joblib>=1.4
+fastapi>=0.115
+uvicorn[standard]>=0.30
+requests>=2.31
+pystac-client>=0.8
+planetary-computer>=1.0
+rasterio>=1.4
+odc-stac>=0.3.10
+xarray>=2024.1
+python-multipart>=0.0.9
+pyshp>=2.3
+openpyxl>=3.1
+pydantic>=2.6
+torch>=2.3          # U-Net + LSTM (CPU build is enough: pip install torch --index-url https://download.pytorch.org/whl/cpu)
+xgboost-cpu>=2.0    # imports as xgboost; avoids unused CUDA/NCCL runtime in production images
+prophet>=1.1
+reportlab>=4.0         # PDF reports
+SQLAlchemy>=2.0
+psycopg[binary]>=3.2
+prometheus-client>=0.21
+# dev only: aiosmtpd  (local SMTP sink: python -m kd.notify sink)

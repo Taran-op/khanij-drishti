@@ -1,0 +1,46 @@
+{
+  "algorithm": "Random forest (300 trees) on real raster features",
+  "metrics": {
+    "cv_auc": 0.618,
+    "pr_auc": 0.147,
+    "occ_auc": 0.976,
+    "occ_auc_far": 0.956,
+    "hit_rate": 0.6,
+    "background_flag_rate": 0.008
+  },
+  "occurrence_check": {
+    "n_occurrences": 50,
+    "auc": 0.976,
+    "auc_far": 0.956,
+    "n_far": 25,
+    "hit_rate": 0.6,
+    "background_flag_rate": 0.008,
+    "by_distance": [
+      {
+        "band": "0\u20133 km",
+        "n": 10,
+        "auc": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "band": "3\u20136 km",
+        "n": 15,
+        "auc": 0.993,
+        "hit_rate": 0.8
+      },
+      {
+        "band": "6\u201310 km",
+        "n": 15,
+        "auc": 0.983,
+        "hit_rate": 0.533
+      },
+      {
+        "band": ">10 km",
+        "n": 10,
+        "auc": 0.915,
+        "hit_rate": 0.0
+      }
+    ],
+    "note": "USGS MRDS 'Occurrence' sites were held out of training. AUC compares the model's score at those sites (3\u00d73 max, MRDS positions are rounded) with background cells >6 km from any recorded site."
+  }
+}

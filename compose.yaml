@@ -1,0 +1,122 @@
+name: khanij-drishti
+
+x-backend: &backend
+  build: ./backend
+  restart: unless-stopped
+  env_file:
+    - path: .env
+      required: false
+  environment: &backend-env
+    KD_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
+    KD_DATA_DIR: /var/lib/khanij-drishti/data
+    KD_MODELS_DIR: /var/lib/khanij-drishti/models
+    KD_DEMO_LOGIN: ${KD_DEMO_LOGIN:-0}
+    KD_WORKER: external
+  volumes:
+    - kd-data:/var/lib/khanij-drishti/data
+    - kd-models:/var/lib/khanij-drishti/models
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    build: ./backend
+    restart: "no"
+    env_file:
+      - path: .env
+        required: false
+    environment: *backend-env
+    command: ["python", "-m", "kd.migrate"]
+    volumes:
+      - kd-data:/var/lib/khanij-drishti/data
+      - kd-models:/var/lib/khanij-drishti/models
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    environment:
+      <<: *backend-env
+      KD_SCHEDULER: "0"
+      KD_LIVE_FEED: "0"
+    command: ["uvicorn", "kd.api:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--proxy-headers"]
+
+  worker:
+    <<: *backend
+    command: ["python", "-m", "kd.jobs", "worker"]
+
+  scheduler:
+    <<: *backend
+    command: ["python", "-m", "kd.scheduler"]
+
+  virtual-mine:
+    <<: *backend
+    command: ["python", "-m", "kd.virtual_mine", "live", "--url", "http://api:8000", "--every", "300"]
+    depends_on:
+      api:
+        condition: service_healthy
+    profiles: ["simulator"]
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    restart: unless-stopped
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=30d"]
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:?set GRAFANA_ADMIN_USER in .env}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on: [prometheus]
+
+volumes:
+  postgis-data:
+  kd-data:
+  kd-models:
+  prometheus-data:
+  grafana-data:

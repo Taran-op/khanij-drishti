@@ -1,0 +1,155 @@
+/* =====================================================================
+   COMMAND CENTER BLOBS
+   Each section is a morphing liquid-glass blob (tinted by --tone from the
+   .tone-* classes). Clicking one morphs it into a full panel via the View
+   Transitions API (view-transition-name = vt-<section>, set inline).
+   ===================================================================== */
+.blobs {
+  position: relative; display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: clamp(18px, 3vw, 44px); padding: 34px 8px 26px; min-height: 360px;
+}
+.blobs-hint { position: absolute; top: 4px; left: 0; right: 0; text-align: center; letter-spacing: .04em; }
+
+.blob-wrap { animation: blob-float 7s ease-in-out infinite; animation-delay: calc(var(--i) * -1.4s); }
+@keyframes blob-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.blob {
+  position: relative; isolation: isolate; width: clamp(170px, 17vw, 220px); aspect-ratio: 1; border: 0; cursor: pointer; padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font: inherit; color: var(--ink); text-align: center;
+  border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, .55), transparent 32%),
+    radial-gradient(circle at 72% 82%, color-mix(in srgb, var(--tone) 40%, transparent), transparent 62%),
+    linear-gradient(140deg, color-mix(in srgb, var(--tone) 22%, var(--glass-a)), var(--glass-b));
+  backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 10px 12px 28px rgba(255, 255, 255, .28),
+    inset -14px -18px 34px color-mix(in srgb, var(--tone) 30%, transparent),
+    0 22px 44px color-mix(in srgb, var(--tone) 28%, transparent);
+  animation: blob-morph 14s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -2.7s);
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s;
+}
+.blob::after { /* specular rim highlight */
+  content: ''; position: absolute; inset: 7% 12% auto auto; width: 26%; height: 14%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, .7), transparent); filter: blur(2px); transform: rotate(28deg); pointer-events: none;
+}
+.blob:hover, .blob:focus-visible {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge), inset 10px 12px 28px rgba(255, 255, 255, .34),
+    inset -14px -18px 34px color-mix(in srgb, var(--tone) 38%, transparent),
+    0 28px 60px color-mix(in srgb, var(--tone) 42%, transparent);
+}
+.blob:focus-visible { outline: 2px solid var(--tone); outline-offset: 6px; }
+.blob:active { transform: scale(.98); }
+@keyframes blob-morph {
+  0%, 100% { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
+  25% { border-radius: 58% 42% 38% 62% / 55% 38% 62% 45%; }
+  50% { border-radius: 36% 64% 55% 45% / 62% 52% 48% 38%; }
+  75% { border-radius: 61% 39% 47% 53% / 39% 60% 40% 61%; }
+}
+
+.blob-ic {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 14px; margin-bottom: 4px; color: var(--tone);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-edge), 0 4px 12px color-mix(in srgb, var(--tone) 30%, transparent);
+}
+.blob-ic.lg { width: 44px; height: 44px; margin: 0; flex: none; }
+.blob-stat { font-size: clamp(24px, 2.4vw, 32px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+.blob-lbl { font-size: 11.5px; color: var(--ink-2); max-width: 80%; }
+.blob-title {
+  margin-top: 8px; font-size: 12.5px; font-weight: 700; padding: 3px 11px; border-radius: 999px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 40%, transparent);
+}
+
+/* dock of mini blobs while a section is open */
+.blob-dock { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dock-back {
+  display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer;
+  padding: 8px 14px 8px 8px; border: 0; border-radius: 999px;
+  background: linear-gradient(135deg, var(--glass-a), var(--glass-b)); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-edge);
+}
+.dock-back:hover { color: var(--c-blue); }
+.blob.mini {
+  width: auto; aspect-ratio: auto; flex-direction: row; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px;
+  animation: none; transform: none;
+  box-shadow: inset 0 0 0 1px var(--glass-edge), inset 4px 4px 10px rgba(255, 255, 255, .22), 0 6px 16px color-mix(in srgb, var(--tone) 22%, transparent);
+}
+.blob.mini:hover { transform: translateY(-2px); }
+.blob.mini::after { display: none; }
+.blob.mini .blob-ic { width: 30px; height: 30px; border-radius: 50%; margin: 0; }
+.mini-t { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+
+/* expanded panel */
+.blob-panel {
+  position: relative; isolation: isolate; border-radius: 28px; padding: 18px 20px 20px;
+  background:
+    radial-gradient(90% 60% at 0% 0%, color-mix(in srgb, var(--tone) 16%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--glass-top), transparent 140px), var(--pane);
+  backdrop-filter: blur(18px) saturate(170%); -webkit-backdrop-filter: blur(18px) saturate(170%);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1px var(--glass-edge), 0 24px 60px color-mix(in srgb, var(--tone) 22%, rgba(10, 20, 40, .25));
+}
+.bp-h { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.bp-h h2 { margin: 0; font-size: 20px; letter-spacing: -.02em; outline: none; }
+.bp-h .icon-btn { font-size: 14px; }
+.bp-map { height: min(62vh, 560px); border-radius: 18px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--glass-edge); }
+.bp-map .gis-wrap { height: 100% !important; }
+.alist.flat { max-height: none; min-height: 0; padding: 0; }
+
+/* ---------- blob ⇄ panel morph (View Transitions) ----------
+   Only 'vt-panel' is a named pair; the rest of the page crossfades as the root.
+   1. backdrop-filter is paused while a transition runs: element snapshots render it as a
+      hard-edged square. It eases back in afterwards (transition on backdrop-filter).
+   2. The old snapshot fades out fast and the new one fades in slightly later, so neither is
+      seen stretched; between them the image-pair itself is a tinted glass droplet whose
+      corners morph blob-round ⇄ panel-round. */
+.blob, .blob-panel { transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s, backdrop-filter .35s, -webkit-backdrop-filter .35s; }
+html.vt-run .blob, html.vt-run .blob-panel { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+::view-transition-group(*) { animation-duration: .5s; animation-timing-function: cubic-bezier(.2, .85, .2, 1); }
+::view-transition-group(vt-panel) { animation-duration: .55s; }
+::view-transition-image-pair(vt-panel) {
+  overflow: hidden; border-radius: 28px;
+  background:
+    radial-gradient(90% 70% at 20% 10%, color-mix(in srgb, var(--vt-tone, var(--c-blue)) 26%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--glass-a), var(--glass-b));
+  box-shadow: inset 0 0 0 1px var(--glass-edge), inset 0 1px 0 var(--glass-hi);
+}
+/* never stretch snapshots: keep them at natural size, centred inside the growing droplet */
+::view-transition-old(vt-panel), ::view-transition-new(vt-panel) { width: 100%; height: 100%; object-fit: none; object-position: center; }
+::view-transition-old(vt-panel) { animation: vt-fade-out .11s ease-out both; }
+::view-transition-old(root) { animation-duration: .22s; }
+::view-transition-new(root) { animation-duration: .38s; }
+::view-transition-new(vt-panel) { animation: vt-fade-in .3s .22s ease-out both; }
+html.vt-open::view-transition-image-pair(vt-panel) { animation: vt-round-open .55s cubic-bezier(.2, .85, .2, 1) both; }
+html.vt-close::view-transition-image-pair(vt-panel) { animation: vt-round-close .55s cubic-bezier(.2, .85, .2, 1) both; }
+html.vt-close::view-transition-new(vt-panel) { animation-delay: .3s; animation-duration: .2s; }
+/* switching sections: panel stays put, content crossfades */
+html.vt-switch::view-transition-old(vt-panel) { animation: vt-fade-out .18s ease-out both; }
+html.vt-switch::view-transition-new(vt-panel) { animation: vt-fade-in .25s .1s ease-out both; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-round-open {
+  from { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
+  60% { border-radius: 34px; }
+  to { border-radius: 28px; }
+}
+@keyframes vt-round-close {
+  from { border-radius: 28px; }
+  40% { border-radius: 34px; }
+  to { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
+}
+
+@media (max-width: 760px) {
+  .blobs { gap: 14px; padding-top: 30px; }
+  .blob { width: 150px; }
+  .blob-stat { font-size: 22px; }
+  .blob-panel { padding: 14px; border-radius: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob, .blob-wrap { animation: none; }
+  ::view-transition-group(*) { animation-duration: 0s; }
+}

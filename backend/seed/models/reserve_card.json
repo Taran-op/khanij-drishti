@@ -1,0 +1,245 @@
+{
+  "name": "Prospectivity classifier",
+  "algorithm": "Mean of random_forest, xgboost, unet",
+  "champion": "ensemble",
+  "champion_version": "ensemble-20261013-143103919",
+  "leaderboard": [
+    {
+      "name": "random_forest",
+      "algorithm": "Random forest (300 trees) on real raster features",
+      "version": "random_forest-20261013-143103720",
+      "cv_auc": 0.618,
+      "pr_auc": 0.147,
+      "occ_auc": 0.976,
+      "occ_auc_far": 0.956,
+      "hit_rate": 0.6,
+      "background_flag_rate": 0.008,
+      "gen_score": 0.787,
+      "champion": false
+    },
+    {
+      "name": "xgboost",
+      "algorithm": "XGBoost (400 trees, depth 4) on real raster features",
+      "version": "xgboost-20261013-143103796",
+      "cv_auc": 0.659,
+      "pr_auc": 0.173,
+      "occ_auc": 0.956,
+      "occ_auc_far": 0.927,
+      "hit_rate": 0.62,
+      "background_flag_rate": 0.027,
+      "gen_score": 0.793,
+      "champion": false
+    },
+    {
+      "name": "unet",
+      "algorithm": "U-Net (16-32-64-128) on real Sentinel-2 + DEM at 0.002\u00b0, pooled to 0.01\u00b0",
+      "version": "unet-20261013-140159655",
+      "cv_auc": 0.847,
+      "pr_auc": 0.333,
+      "occ_auc": 0.91,
+      "occ_auc_far": 0.823,
+      "hit_rate": 0.76,
+      "background_flag_rate": 0.021,
+      "gen_score": 0.835,
+      "champion": false
+    },
+    {
+      "name": "ensemble",
+      "algorithm": "Mean of random_forest, xgboost, unet",
+      "version": "ensemble-20261013-143103919",
+      "cv_auc": 0.777,
+      "pr_auc": 0.304,
+      "occ_auc": 0.974,
+      "occ_auc_far": 0.952,
+      "hit_rate": 0.62,
+      "background_flag_rate": 0.006,
+      "gen_score": 0.865,
+      "champion": true
+    }
+  ],
+  "explanation_model": "random forest (local explanations and feature importance come from the RF, for every champion)",
+  "inputs": "real only",
+  "label_source": "USGS MRDS producers/past producers + OSM-verified MOIL mines",
+  "sites": {
+    "mines": 30,
+    "occurrences": 50
+  },
+  "occurrence_check": {
+    "n_occurrences": 50,
+    "auc": 0.974,
+    "auc_far": 0.952,
+    "n_far": 25,
+    "hit_rate": 0.62,
+    "threshold": 0.5,
+    "background_flag_rate": 0.006,
+    "by_distance": [
+      {
+        "band": "0\u20133 km",
+        "n": 10,
+        "auc": 1.0,
+        "hit_rate": 1.0
+      },
+      {
+        "band": "3\u20136 km",
+        "n": 15,
+        "auc": 0.994,
+        "hit_rate": 0.8
+      },
+      {
+        "band": "6\u201310 km",
+        "n": 15,
+        "auc": 0.995,
+        "hit_rate": 0.6
+      },
+      {
+        "band": ">10 km",
+        "n": 10,
+        "auc": 0.889,
+        "hit_rate": 0.0
+      }
+    ],
+    "note": "USGS MRDS 'Occurrence' sites were held out of training. AUC compares the model's score at those sites (3\u00d73 max, MRDS positions are rounded) with background cells >6 km from any recorded site."
+  },
+  "subsurface_data": "SIMULATED boreholes: no public borehole logs exist for the belt; upload real logs to replace",
+  "subsurface_algorithm": "Ridge regression on borehole intercepts (grade, thickness)",
+  "labels": {
+    "positive": 125,
+    "negative": 1500,
+    "unlabelled": 10375
+  },
+  "validation": "5-fold spatial block CV (0.2\u00b0 \u00d7 0.25\u00b0 blocks)",
+  "roc_auc": 0.777,
+  "pr_auc": 0.304,
+  "importance": [
+    {
+      "feature": "Magnetic anomaly",
+      "key": "mag_nT",
+      "value": 0.1704,
+      "real": true
+    },
+    {
+      "feature": "Elevation",
+      "key": "elevation",
+      "value": 0.1353,
+      "real": true
+    },
+    {
+      "feature": "Distance to lineament",
+      "key": "lineament_km",
+      "value": 0.125,
+      "real": true
+    },
+    {
+      "feature": "Lithology: Mesoproterozoic sedimentary and volcanic rocks",
+      "key": "geo_u1",
+      "value": 0.0977,
+      "real": true
+    },
+    {
+      "feature": "Mn index (7\u00d77 context)",
+      "key": "mn_ctx7_mean",
+      "value": 0.0683,
+      "real": true
+    },
+    {
+      "feature": "Mn index (3\u00d73 context)",
+      "key": "mn_ctx3_mean",
+      "value": 0.0483,
+      "real": true
+    },
+    {
+      "feature": "Mn index texture (7\u00d77)",
+      "key": "mn_ctx7_std",
+      "value": 0.0456,
+      "real": true
+    },
+    {
+      "feature": "SAR VH backscatter",
+      "key": "sar_vh",
+      "value": 0.0437,
+      "real": true
+    },
+    {
+      "feature": "Slope",
+      "key": "slope",
+      "value": 0.0433,
+      "real": true
+    },
+    {
+      "feature": "Mn-oxide spectral index",
+      "key": "mn_index",
+      "value": 0.037,
+      "real": true
+    },
+    {
+      "feature": "Clay/hydroxyl ratio (B11/B12)",
+      "key": "clay_ratio",
+      "value": 0.034,
+      "real": true
+    },
+    {
+      "feature": "Land surface temp",
+      "key": "lst",
+      "value": 0.0333,
+      "real": true
+    },
+    {
+      "feature": "SAR backscatter",
+      "key": "sar_vv",
+      "value": 0.0293,
+      "real": true
+    },
+    {
+      "feature": "NDVI",
+      "key": "ndvi",
+      "value": 0.0279,
+      "real": true
+    },
+    {
+      "feature": "Ferric-oxide ratio (B4/B2)",
+      "key": "iron_ratio",
+      "value": 0.0252,
+      "real": true
+    },
+    {
+      "feature": "Lithology: Archean crystalline metamorphic rocks",
+      "key": "geo_u0",
+      "value": 0.0234,
+      "real": true
+    },
+    {
+      "feature": "Lithology: Mesozoic-Cenozoic volcanic rocks",
+      "key": "geo_u2",
+      "value": 0.0087,
+      "real": true
+    },
+    {
+      "feature": "Lithology: Paleoproterozoic sedimentary rocks",
+      "key": "geo_u3",
+      "value": 0.0036,
+      "real": true
+    }
+  ],
+  "real_share": 1.0,
+  "subsurface": {
+    "grade_mn_pct": {
+      "r2": 0.115,
+      "mae": 3.85,
+      "n": 81
+    },
+    "thickness_m": {
+      "r2": 0.135,
+      "mae": 1.58,
+      "n": 81
+    }
+  },
+  "hidden_horizon_check": {},
+  "threshold": 0.5,
+  "threshold_rule": "per model: the score flagging 3% of background cells (>6 km from any recorded site), floor 0.5",
+  "tonnage_assumptions": {
+    "density_t_m3": 3.8,
+    "depth_extent_m": 100,
+    "continuity": 0.2,
+    "cell_strike_m": 1000
+  }
+}
