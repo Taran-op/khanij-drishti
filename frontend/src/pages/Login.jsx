@@ -64,7 +64,7 @@ export default function Login({ theme, toggleTheme }) {
         <div className="brand big">
           <img src="/favicon.svg" alt="" width="44" height="44" />
           <div>
-            <div className="brand-n">KhanijDrishti</div>
+            <div className="brand-n">KhanijSetu</div>
             <div className="brand-s">Manganese intelligence platform</div>
           </div>
         </div>

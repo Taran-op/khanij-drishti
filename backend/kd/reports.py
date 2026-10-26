@@ -355,7 +355,7 @@ def to_pdf(doc, path):
         canvas.saveState()
         canvas.setFont(f["regular"], 7)
         canvas.setFillColor(MUTED)
-        canvas.drawString(15 * mm, 9 * mm, f"KhanijDrishti · {doc['title']} · generated {doc['generated'].replace('T', ' ')}")
+        canvas.drawString(15 * mm, 9 * mm, f"KhanijSetu · {doc['title']} · generated {doc['generated'].replace('T', ' ')}")
         canvas.drawRightString(size[0] - 15 * mm, 9 * mm, f"page {d.page}")
         canvas.restoreState()
 
@@ -407,7 +407,7 @@ def to_pdf(doc, path):
     if doc.get("notes"):
         story += [Paragraph("Notes and data provenance", st["h2"])] + [Paragraph("• " + n, st["note"]) for n in doc["notes"]]
     SimpleDocTemplate(str(path), pagesize=size, leftMargin=15 * mm, rightMargin=15 * mm, topMargin=13 * mm, bottomMargin=15 * mm,
-                      title=doc["title"], author="KhanijDrishti").build(story, onFirstPage=page, onLaterPages=page)
+                      title=doc["title"], author="KhanijSetu").build(story, onFirstPage=page, onLaterPages=page)
     return path
 
 
@@ -426,7 +426,7 @@ def to_xlsx(doc, path):
     ws["A1"] = doc["title"]
     ws["A1"].font = Font(bold=True, size=16, color=navy)
     ws["A2"] = doc.get("subtitle", "")
-    ws["A3"] = f"Generated {doc['generated'].replace('T', ' ')} · KhanijDrishti"
+    ws["A3"] = f"Generated {doc['generated'].replace('T', ' ')} · KhanijSetu"
     ws["A2"].font = ws["A3"].font = Font(color="5B6B79", size=9)
     r = 5
     for k, v, s in doc.get("kpis", []):

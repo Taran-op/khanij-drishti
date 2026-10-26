@@ -49,7 +49,7 @@ def ingest():
             continue
         prov = raw["provenance"].get(p.name.split(".")[0])
         log.append(dict(source=p.parent.name, file=p.name, channel=CHANNELS.get(p.parent.name, ""), records=n,
-                        real=bool(prov and prov.get("real")), origin=(prov or {}).get("source", "KhanijDrishti simulator")))
+                        real=bool(prov and prov.get("real")), origin=(prov or {}).get("source", "KhanijSetu simulator")))
     storage.write_table("ingestion_log", pd.DataFrame(log))
     storage.write_table("provenance", pd.DataFrame([
         dict(name=k, real=v.get("real", False), source=v.get("source"), collection=v.get("collection"),
@@ -344,7 +344,7 @@ def run():
         prov = raw["provenance"].get(src, {})
         real = bool(prov.get("real"))
         cat[name] = dict(unit=unit, group=group, desc=desc, real=real,
-                         source=prov.get("source", "KhanijDrishti simulator") + (f" · {prov['collection']}" if prov.get("collection") else ""),
+                         source=prov.get("source", "KhanijSetu simulator") + (f" · {prov['collection']}" if prov.get("collection") else ""),
                          date_range=str(prov.get("date_range") or prov.get("year") or ""))
     storage.write_grid({k: L[k] for k in cat}, cat)
     storage.write_vector("lineaments", raw.get("osm_rivers") or raw["lineaments"])

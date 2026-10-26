@@ -34,7 +34,7 @@ SEVERITY = {"info": 0, "medium": 1, "high": 2}
 AUDIENCES = ("operations", "planners", "geology", "management")
 MAX_ATTEMPTS = 3
 DEFAULTS = dict(
-    smtp_host="", smtp_port="587", smtp_security="starttls", smtp_user="", smtp_from="KhanijDrishti <alerts@localhost>",
+    smtp_host="", smtp_port="587", smtp_security="starttls", smtp_user="", smtp_from="KhanijSetu <alerts@localhost>",
     sms_base_url="https://api.twilio.com", sms_account_sid="", sms_from="",
     email_enabled="0", sms_enabled="0",
 )
@@ -165,12 +165,12 @@ def enqueue_alerts(alerts):
                     skipped += 1
                     continue
                 if r["channel"] == "sms":
-                    body = f"KhanijDrishti {a['severity'].upper()}: {a['title']}. {a['recommended_action']}"[:300]
+                    body = f"KhanijSetu {a['severity'].upper()}: {a['title']}. {a['recommended_action']}"[:300]
                 else:
                     body = (f"{a['message']}\n\nRecommended action: {a['recommended_action']}\n\n"
                             f"Category: {a['category']} · severity: {a['severity']} · alert {a['alert_id']} · {a['ts']}\n"
-                            f"Addressed to: {a['audience'].replace(',', ', ')}\n\n— KhanijDrishti early-warning system")
-                _queue(c, "alert", a["alert_id"], r, f"[KhanijDrishti][{a['severity'].upper()}] {a['title']}", body, dedup_key=key)
+                            f"Addressed to: {a['audience'].replace(',', ', ')}\n\n— KhanijSetu early-warning system")
+                _queue(c, "alert", a["alert_id"], r, f"[KhanijSetu][{a['severity'].upper()}] {a['title']}", body, dedup_key=key)
                 n += 1
     return dict(queued=n, deduplicated=skipped)
 
@@ -181,10 +181,10 @@ def enqueue_report(name, title, path, audiences, summary=""):
     with _con() as c:
         for r in rs:
             if r["channel"] == "email":
-                _queue(c, "report", name, r, f"[KhanijDrishti] {title}",
-                       f"{summary}\n\nThe full report is attached ({Path(path).name}).\n\n— KhanijDrishti scheduled reports", attachment=path)
+                _queue(c, "report", name, r, f"[KhanijSetu] {title}",
+                       f"{summary}\n\nThe full report is attached ({Path(path).name}).\n\n— KhanijSetu scheduled reports", attachment=path)
             else:
-                _queue(c, "report", name, r, title, f"KhanijDrishti: {title} is ready. {summary}"[:300])
+                _queue(c, "report", name, r, title, f"KhanijSetu: {title} is ready. {summary}"[:300])
     return len(rs)
 
 
@@ -192,8 +192,8 @@ def enqueue_test(channel, address):
     init()
     r = dict(channel=channel, name="test", address=address)
     with _con() as c:
-        _queue(c, "test", "test", r, "[KhanijDrishti] Test message",
-               "This is a test message from KhanijDrishti. If you received it, delivery is configured correctly.")
+        _queue(c, "test", "test", r, "[KhanijSetu] Test message",
+               "This is a test message from KhanijSetu. If you received it, delivery is configured correctly.")
 
 
 # ---- delivery --------------------------------------------------------------------------------

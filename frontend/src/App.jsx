@@ -110,7 +110,7 @@ function Shell({ children, theme, toggleTheme }) {
         <div className="brand">
           <img src="/favicon.svg" alt="" width="30" height="30" />
           <div>
-            <div className="brand-n">KhanijDrishti</div>
+            <div className="brand-n">KhanijSetu</div>
             <div className="brand-s">Manganese intelligence</div>
           </div>
         </div>

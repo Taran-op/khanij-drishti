@@ -1,4 +1,4 @@
-# KhanijDrishti production deployment
+# KhanijSetu production deployment
 
 The same application image runs as API, asynchronous worker and scheduler. PostgreSQL 16 with
 PostGIS is the system of record; object/PVC storage holds raw lake files and model artifacts. The

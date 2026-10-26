@@ -1,4 +1,4 @@
-# KhanijDrishti
+# KhanijSetu
 
 **AI/ML and space technology for manganese reserve identification and production shortfall prediction**
 

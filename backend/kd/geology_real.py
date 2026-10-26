@@ -23,7 +23,7 @@ from . import geo
 from .config import BOUNDS, LAKE, RES
 
 GEOL = LAKE / "geology"
-UA = {"User-Agent": "KhanijDrishti/1.0 (SIH research prototype)"}
+UA = {"User-Agent": "KhanijSetu/1.0 (SIH research prototype)"}
 PAD = 0.3  # fetch a margin around the study area so edges are well-defined
 
 

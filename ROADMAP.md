@@ -1,4 +1,4 @@
-# KhanijDrishti: road to "every box in the architecture, on real data"
+# KhanijSetu: road to "every box in the architecture, on real data"
 
 Decisions (2026-10-12):
 - **Mine operational data:** real ingestion APIs (IoT/HTTP + CSV/Excel upload), fed by a separate *virtual mine* telemetry service calibrated to MOIL's published production. A real mine later just points its feed at the API.

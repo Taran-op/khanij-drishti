@@ -10,5 +10,5 @@
   ],
   "refresh":"30s","schemaVersion":39,"tags":["khanij-drishti","production"],
   "templating":{"list":[]},"time":{"from":"now-6h","to":"now"},"timezone":"browser",
-  "title":"KhanijDrishti Operations","uid":"khanij-operations","version":1
+  "title":"KhanijSetu Operations","uid":"khanij-operations","version":1
 }

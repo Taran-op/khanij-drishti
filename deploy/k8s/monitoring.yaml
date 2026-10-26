@@ -16,7 +16,7 @@ spec:
           expr: up{job=~".*kd-api.*"} == 0
           for: 5m
           labels: {severity: critical}
-          annotations: {summary: KhanijDrishti API is unavailable}
+          annotations: {summary: KhanijSetu API is unavailable}
         - alert: IngestionDeadLetters
           expr: increase(kd_ingest_dead_letter[15m]) > 0
           labels: {severity: warning}

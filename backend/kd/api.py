@@ -26,7 +26,7 @@ from . import (alerts, auth, backup, db, geo, ingest, jobs, migrate, moil_public
 from .auth import current_user, require
 from .config import AS_OF, BOUNDS, GEODB, HORIZON_DAYS, MINE_BY_ID, MINES, MODELS, RES, ROOT, WAREHOUSE
 
-app = FastAPI(title="KhanijDrishti API", version="1.0")
+app = FastAPI(title="KhanijSetu API", version="1.0")
 # The production UI is same-origin behind nginx. Extra browser origins must be explicit; an empty
 # default is deliberately safer than accepting every origin.
 _origins = [o.strip() for o in os.environ.get("KD_ALLOWED_ORIGINS", os.environ.get("KD_CORS_ORIGINS", "")).split(",") if o.strip()]

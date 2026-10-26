@@ -194,5 +194,5 @@ def external():
 
 
 if __name__ == "__main__":
-    print("KhanijDrishti worker: polling the job queue (Ctrl+C to stop)", flush=True)
+    print("KhanijSetu worker: polling the job queue (Ctrl+C to stop)", flush=True)
     worker_loop()

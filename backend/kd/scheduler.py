@@ -224,7 +224,7 @@ def stop():
 
 
 if __name__ == "__main__":
-    print("KhanijDrishti scheduler (Ctrl+C to stop)")
+    print("KhanijSetu scheduler (Ctrl+C to stop)")
     init()
     print(json.dumps(listing()["schedules"], indent=1, default=str))
     _loop(30)
