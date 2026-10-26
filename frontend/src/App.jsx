@@ -129,7 +129,7 @@ function Shell({ children, theme, toggleTheme }) {
           ))}
         </nav>
         <div className="top-r">
-          <button className={`mode-switch ${mode === 'simulation' ? 'demo' : 'live'}`} onClick={toggleMode}
+          <button className={`mode-switch ${mode === 'simulation' ? 'is-demo' : 'is-live'}`} onClick={toggleMode}
                   aria-label={`Data mode: ${mode === 'simulation' ? 'simulation demo' : 'verified live'}. Click to switch.`}
                   title={mode === 'simulation' ? 'Demo data is synthetic and not MOIL live data. Click for verified live mode.' : 'Verified data only. Click for the screening-round simulation.'}>
             <span className="mode-label">Data</span><span className="mode-value"><span className="dot" />{mode === 'simulation' ? 'Demo' : 'Live'}</span>
