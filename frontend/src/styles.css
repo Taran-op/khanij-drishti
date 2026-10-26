@@ -182,9 +182,9 @@ code, .mono { font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; 
 }
 .topnav nav a.active svg { color: var(--accent); }
 .topnav nav a .pill { font-style: normal; background: #dc2626; color: #fff; font-size: 10px; line-height: 16px; padding: 0 6px; border-radius: 10px; box-shadow: 0 2px 6px rgba(220, 38, 38, .4); }
-.mode-switch { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--border); border-radius: 12px; padding: 3px; background: color-mix(in srgb, var(--surface) 58%, transparent); color: var(--ink-2); font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; white-space: nowrap; box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+.mode-switch { display: inline-flex; align-items: center; align-self: center; gap: 2px; width: auto; height: 34px; min-height: 0; box-sizing: border-box; border: 1px solid var(--border); border-radius: 11px; padding: 2px; background: color-mix(in srgb, var(--surface) 58%, transparent); color: var(--ink-2); font: inherit; font-size: 10px; line-height: 1; font-weight: 750; cursor: pointer; white-space: nowrap; box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
 .mode-label { padding: 0 5px 0 6px; color: var(--muted); font-weight: 650; }
-.mode-value { display: inline-flex; align-items: center; gap: 5px; min-width: 47px; justify-content: center; padding: 5px 8px; border-radius: 9px; color: var(--ink); background: var(--glass-fill); box-shadow: 0 3px 10px rgba(0,0,0,.1), inset 0 0 0 1px var(--glass-line); }
+.mode-value { display: inline-flex; align-items: center; gap: 5px; min-width: 47px; height: 28px; box-sizing: border-box; justify-content: center; padding: 0 8px; border-radius: 8px; color: var(--ink); background: var(--glass-fill); box-shadow: 0 3px 10px rgba(0,0,0,.1), inset 0 0 0 1px var(--glass-line); }
 .mode-switch .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-green); box-shadow: 0 0 7px color-mix(in srgb, var(--c-green) 75%, transparent); }
 .mode-switch.demo .mode-value { color: var(--c-amber); background: color-mix(in srgb, var(--c-amber) 10%, var(--glass-fill)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-amber) 35%, transparent); }
 .mode-switch.demo .dot { background: var(--c-amber); box-shadow: 0 0 7px color-mix(in srgb, var(--c-amber) 75%, transparent); }
@@ -207,7 +207,7 @@ code, .mono { font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; 
 .page-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 
 @media (max-width: 1080px) { .topnav nav a span { display: none; } .topnav nav a { padding: 9px 11px; } }
-@media (max-width: 760px) { .mode-label { display: none; } .mode-switch { padding: 3px; } .mode-value { min-width: 42px; padding: 6px; } }
+@media (max-width: 760px) { .mode-label { display: none; } .mode-switch { padding: 2px; } .mode-value { min-width: 42px; padding: 0 6px; } }
 @media (max-width: 1080px) and (min-width: 761px) { .topnav nav a .pill { position: absolute; top: 1px; right: 0; } }
 @media (max-width: 760px) {
   .topnav { margin: 8px 8px 0; top: 8px; padding: 0 8px 0 10px; gap: 8px; }
