@@ -130,8 +130,9 @@ function Shell({ children, theme, toggleTheme }) {
         </nav>
         <div className="top-r">
           <button className={`mode-switch ${mode === 'simulation' ? 'demo' : 'live'}`} onClick={toggleMode}
-                  title={mode === 'simulation' ? 'Switch to verified live data' : 'Switch to clearly labelled simulation data'}>
-            <span className="dot" />{mode === 'simulation' ? 'Simulation demo' : 'Verified live'}
+                  aria-label={`Data mode: ${mode === 'simulation' ? 'simulation demo' : 'verified live'}. Click to switch.`}
+                  title={mode === 'simulation' ? 'Demo data is synthetic and not MOIL live data. Click for verified live mode.' : 'Verified data only. Click for the screening-round simulation.'}>
+            <span className="mode-label">Data</span><span className="mode-value"><span className="dot" />{mode === 'simulation' ? 'Demo' : 'Live'}</span>
           </button>
           <span className="asof" title="Balaghat · Nagpur · Bhandara belt · 6 producing mines · 12,000 grid cells">
             <span className="dot" data-ok={health.data?.ok ? '1' : '0'} />
@@ -147,8 +148,7 @@ function Shell({ children, theme, toggleTheme }) {
           <button className="hamb" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>☰</button>
         </div>
       </header>
-      {mode === 'simulation' && <div className="demo-ribbon">SIMULATION DEMO · Operational figures and alerts are synthetic, not MOIL live data</div>}
-      <main className={`content ${mode === 'simulation' ? 'has-demo-ribbon' : ''}`}>{children}</main>
+      <main className={`content ${mode === 'simulation' ? 'simulation-mode' : ''}`}>{children}</main>
     </div>
   )
 }
