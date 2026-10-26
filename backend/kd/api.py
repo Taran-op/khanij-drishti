@@ -31,7 +31,7 @@ app = FastAPI(title="KhanijSetu API", version="1.0")
 # default is deliberately safer than accepting every origin.
 _origins = [o.strip() for o in os.environ.get("KD_ALLOWED_ORIGINS", os.environ.get("KD_CORS_ORIGINS", "")).split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-                   allow_headers=["Authorization", "Content-Type", "X-Device-Key"], allow_credentials=True)
+                   allow_headers=["Authorization", "Content-Type", "X-Device-Key", "X-KD-Data-Mode"], allow_credentials=True)
 
 _grid = {}
 _sync = dict(t=0.0, seen=None)
@@ -127,6 +127,10 @@ class Registration(Login):
 
 def _ip(request):
     return request.client.host if request.client else "?"
+
+
+def _simulation(request: Request):
+    return request.headers.get("X-KD-Data-Mode", "live").lower() == "simulation"
 
 
 @app.post("/api/auth/login")
@@ -225,9 +229,10 @@ def health():
 
 
 @app.get("/api/overview")
-def overview(user=Depends(require("overview"))):
+def overview(request: Request, user=Depends(require("overview"))):
     reality = ingest.operational_reality()
-    if not reality["available"]:
+    demo = _simulation(request)
+    if not reality["available"] and not demo:
         zones = storage.read_table("reserve_zones")
         new = zones[zones.status == "new"]
         return dict(as_of=str(AS_OF), month=str(AS_OF)[:7], operational_data_available=False,
@@ -244,7 +249,7 @@ def overview(user=Depends(require("overview"))):
     new = zones[zones.status == "new"]
     return dict(
         as_of=str(AS_OF), month=str(AS_OF)[:7], fy=fy, operational_data_available=True,
-        operational_status=reality,
+        data_mode="simulation" if demo and not reality["available"] else "live", operational_status=reality,
         kpis=dict(
             month_target_t=tot_target, month_projected_t=tot_proj, month_mtd_t=sum(v["mtd_actual_t"] for v in month.values()),
             month_gap_t=tot_target - tot_proj,
@@ -332,19 +337,19 @@ def mines():
 
 
 @app.get("/api/production/{mine_id}", dependencies=[Depends(require("production"))])
-def production(mine_id: str, days: int = 120):
+def production(mine_id: str, request: Request, days: int = 120):
     _check(mine_id)
     reality = ingest.operational_reality()
-    if not reality["available"]:
+    if not reality["available"] and not _simulation(request):
         raise HTTPException(503, detail=reality)
     return dict(mine=MINE_BY_ID[mine_id], history=shortfall.history(mine_id, days),
                 forecast=shortfall.forecast(mine_id), drivers=shortfall.drivers(mine_id))
 
 
 @app.get("/api/forecast", dependencies=[Depends(require("production"))])
-def forecast_all():
+def forecast_all(request: Request):
     reality = ingest.operational_reality()
-    if not reality["available"]:
+    if not reality["available"] and not _simulation(request):
         raise HTTPException(503, detail=reality)
     return dict(as_of=str(AS_OF), horizon_days=HORIZON_DAYS, model=_card("shortfall"),
                 mines={m["id"]: shortfall.forecast(m["id"]) for m in MINES})
@@ -385,10 +390,16 @@ def actions():
 
 # ---- alerts, reports, system -----------------------------------------------------------------
 @app.get("/api/alerts")
-def get_alerts(user=Depends(require("alerts"))):
+def get_alerts(request: Request, user=Depends(require("alerts"))):
     reality = ingest.operational_reality()
-    if not reality["available"]:
+    demo = _simulation(request)
+    if not reality["available"] and not demo:
         return dict(alerts=[], notifications=[], operational_status=reality, real_time=False)
+    if demo and not reality["available"]:
+        rows = alerts.generate(allow_simulated=True, dispatch_notifications=False)
+        aud = auth.alert_audience(user)
+        rows = rows if aud is None else [a for a in rows if aud & set(a["audience"].split(","))]
+        return dict(alerts=rows, notifications=[], operational_status=reality, real_time=False, data_mode="simulation")
     al = _visible_alerts(user)
     ids = set(al.alert_id)
     notes = [m for m in notify_outbox(user)["messages"] if m["kind"] != "alert" or m["ref"] in ids]

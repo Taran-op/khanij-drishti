@@ -7,7 +7,7 @@ import Optimize from './pages/Optimize'
 import Alerts from './pages/Alerts'
 import System from './pages/System'
 import Login from './pages/Login'
-import { api, useApi } from './api'
+import { api, getDataMode, setDataMode, useApi } from './api'
 import { AuthProvider, useAuth } from './auth'
 import { Card, Loading } from './components/ui'
 
@@ -99,10 +99,15 @@ function UserMenu() {
 
 function Shell({ children, theme, toggleTheme }) {
   const { can } = useAuth()
-  const health = useApi(() => fetch('/api/health').then((r) => r.json()), [])
+  const health = useApi(api.health, [])
   const alerts = useApi(() => (can('alerts') ? api.alerts() : Promise.resolve(null)), [])
   const high = alerts.data?.alerts.filter((a) => a.severity === 'high' && a.status === 'open').length
   const [open, setOpen] = useState(false)
+  const [mode] = useState(getDataMode)
+  const toggleMode = () => {
+    setDataMode(mode === 'simulation' ? 'live' : 'simulation')
+    window.location.reload()
+  }
   return (
     <div className="shell">
       <div className="liquid-bg" aria-hidden="true"><i /><i /><i /></div>
@@ -124,6 +129,10 @@ function Shell({ children, theme, toggleTheme }) {
           ))}
         </nav>
         <div className="top-r">
+          <button className={`mode-switch ${mode === 'simulation' ? 'demo' : 'live'}`} onClick={toggleMode}
+                  title={mode === 'simulation' ? 'Switch to verified live data' : 'Switch to clearly labelled simulation data'}>
+            <span className="dot" />{mode === 'simulation' ? 'Simulation demo' : 'Verified live'}
+          </button>
           <span className="asof" title="Balaghat · Nagpur · Bhandara belt · 6 producing mines · 12,000 grid cells">
             <span className="dot" data-ok={health.data?.ok ? '1' : '0'} />
             <span className="hide-sm">Data as of </span><b>{health.data?.as_of ?? '…'}</b>
@@ -138,7 +147,8 @@ function Shell({ children, theme, toggleTheme }) {
           <button className="hamb" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>☰</button>
         </div>
       </header>
-      <main className="content">{children}</main>
+      {mode === 'simulation' && <div className="demo-ribbon">SIMULATION DEMO · Operational figures and alerts are synthetic, not MOIL live data</div>}
+      <main className={`content ${mode === 'simulation' ? 'has-demo-ribbon' : ''}`}>{children}</main>
     </div>
   )
 }

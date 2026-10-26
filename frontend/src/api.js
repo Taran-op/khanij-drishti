@@ -3,6 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // Session token (set by the auth context). Every request carries it; a 401 signs the user out.
 let token = null
 export const setToken = (t) => { token = t }
+let dataMode = (() => { try { return sessionStorage.getItem('kd-data-mode') || 'live' } catch { return 'live' } })()
+export const setDataMode = (mode) => {
+  dataMode = mode === 'simulation' ? 'simulation' : 'live'
+  try { sessionStorage.setItem('kd-data-mode', dataMode) } catch { /* private mode */ }
+}
+export const getDataMode = () => dataMode
 
 // Empty in local/same-origin deployments. Vercel sets VITE_API_BASE to the public HTTPS URL of
 // the container API (for example https://api.khanij.example.gov.in) at build time.
@@ -10,7 +16,7 @@ const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')
 const endpoint = (url) => API_BASE && url.startsWith('/api/') ? `${API_BASE}${url}` : url
 
 async function request(url, opts = {}) {
-  const r = await fetch(endpoint(url), { ...opts, headers: { ...(opts.headers || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
+  const r = await fetch(endpoint(url), { ...opts, headers: { ...(opts.headers || {}), 'X-KD-Data-Mode': dataMode, ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
   if (r.status === 401 && token) window.dispatchEvent(new Event('kd-unauthorized'))
   if (!r.ok) {
     let detail = r.statusText

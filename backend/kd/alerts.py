@@ -12,10 +12,10 @@ import pandas as pd
 from . import ingest, notify, shortfall, storage
 from .config import AS_OF, FESTIVALS, MINES
 
-def generate():
+def generate(allow_simulated=False, dispatch_notifications=True):
     now = datetime.now().isoformat(timespec="seconds")
     reality = ingest.operational_reality()
-    if not reality["available"]:
+    if not reality["available"] and not allow_simulated:
         empty = pd.DataFrame(columns=["alert_id", "ts", "severity", "category", "ref", "title", "message",
                                             "recommended_action", "audience", "status"])
         storage.write_table("alerts", empty)
@@ -82,7 +82,8 @@ def generate():
     for i, a in enumerate(alerts):
         a["alert_id"] = f"AL-{i+1:03d}"
     storage.write_table("alerts", pd.DataFrame(alerts))
-    dispatch(alerts)
+    if dispatch_notifications:
+        dispatch(alerts)
     storage.log_run(5, "alerts", total=len(alerts), high=sum(a["severity"] == "high" for a in alerts))
     return alerts
 
