@@ -29,7 +29,7 @@ services:
       - key: KD_BOOTSTRAP_ADMIN_PASSWORD
         sync: false
       - key: KD_ALLOWED_ORIGINS
-        value: https://frontend-one-theta-32.vercel.app
+        value: https://khanijsetu-app.vercel.app,https://frontend-one-theta-32.vercel.app
       - key: KD_DEMO_LOGIN
         value: "0"
       - key: KD_WORKER
