@@ -38,6 +38,7 @@ const layerCache = new Map()
 
 export const api = {
   login: (username, password) => j('/api/auth/login', post({ username, password })),
+  register: (name, username, password) => j('/api/auth/register', post({ name, username, password })),
   me: () => j('/api/auth/me'),
   health: () => j('/api/health'),
   logout: () => j('/api/auth/logout', post()),

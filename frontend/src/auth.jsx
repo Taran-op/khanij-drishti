@@ -46,6 +46,14 @@ export function AuthProvider({ children }) {
     setSession(s)
     return r.user
   }
+  const register = async (name, username, password, remember) => {
+    const r = await api.register(name, username, password)
+    const s = { token: r.token, user: r.user, expires: Date.now() + r.expires_in * 1000 }
+    setToken(r.token)
+    try { (remember ? localStorage : sessionStorage).setItem(KEY, JSON.stringify(s)) } catch { /* private mode */ }
+    setSession(s)
+    return r.user
+  }
   const logout = async () => {
     try { await api.logout() } catch { /* already invalid */ }
     clear()
@@ -55,5 +63,5 @@ export function AuthProvider({ children }) {
   }
   const can = (perm) => !!session?.user.perms.includes(perm)
 
-  return <AuthCtx.Provider value={{ user: session?.user, checking, login, logout, can }}>{children}</AuthCtx.Provider>
+  return <AuthCtx.Provider value={{ user: session?.user, checking, login, register, logout, can }}>{children}</AuthCtx.Provider>
 }

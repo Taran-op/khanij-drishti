@@ -54,8 +54,11 @@ ROLES = {
     "ops": dict(label="Operations Team", audience={"operations"},
                 perms=["overview", "production", "optimize", "optimize_run", "alerts", "alerts_ack", "reports"],
                 focus="Monitor production, risk alerts, corrective actions"),
+    "viewer": dict(label="Viewer / Analyst", audience={"management", "planners", "geology", "operations"},
+                   perms=["overview", "reserves", "production", "alerts", "reports"],
+                   focus="Read-only dashboards, reserve maps, forecasts and reports"),
 }
-HOME = {"admin": "/system", "mgmt": "/", "planner": "/reserves", "ops": "/production"}
+HOME = {"admin": "/system", "mgmt": "/", "planner": "/reserves", "ops": "/production", "viewer": "/"}
 
 _failures = {}
 
@@ -155,6 +158,32 @@ def login(username, password, ip):
     user = public_user(row)
     user["last_login"] = prev
     return dict(token=issue_token(row), expires_in=TOKEN_TTL_S, user=user)
+
+
+def register(username, name, password, ip):
+    """Create a public, least-privilege account and immediately issue a session."""
+    username = (username or "").strip().lower()
+    name = " ".join((name or "").strip().split())
+    if not 3 <= len(username) <= 32 or not username.replace("_", "").replace("-", "").isalnum():
+        raise HTTPException(422, "Username must be 3-32 characters using letters, numbers, _ or -.")
+    if not 2 <= len(name) <= 80:
+        raise HTTPException(422, "Name must be between 2 and 80 characters.")
+    if len(password or "") < 10 or not any(c.isalpha() for c in password) or not any(c.isdigit() for c in password):
+        raise HTTPException(422, "Password must be at least 10 characters and include a letter and number.")
+    salt, password_hash = hash_password(password)
+    created = datetime.now().isoformat(timespec="seconds")
+    try:
+        with _con() as c:
+            c.execute("INSERT INTO users VALUES (?,?,?,?,?,?,NULL)",
+                      (username, name, "viewer", salt, password_hash, created))
+            row = c.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
+    except Exception as exc:
+        if "unique" in str(exc).lower() or "duplicate" in str(exc).lower():
+            _audit(username, "register_duplicate", ip, False)
+            raise HTTPException(409, "That username is already taken.") from None
+        raise
+    _audit(username, "register", ip, True)
+    return dict(token=issue_token(row), expires_in=TOKEN_TTL_S, user=public_user(row))
 
 
 def current_user(request: Request, authorization: str | None = Header(None)):

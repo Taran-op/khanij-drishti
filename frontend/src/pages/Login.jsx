@@ -10,7 +10,9 @@ const ROLE_ICON = {
 }
 
 export default function Login({ theme, toggleTheme }) {
-  const { login } = useAuth()
+  const { login, register } = useAuth()
+  const [mode, setMode] = useState('login')
+  const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
@@ -36,6 +38,18 @@ export default function Login({ theme, toggleTheme }) {
       window.location.hash = user.home
     } catch (ex) {
       setErr(ex.status === 429 ? ex.message : ex.status === 401 ? 'Invalid username or password.' : `Couldn't reach the server (${ex.message}).`)
+    } finally { setBusy(false) }
+  }
+
+  const signUp = async (e) => {
+    e.preventDefault()
+    if (!name.trim() || !username || !password) { setErr('Complete all fields.'); return }
+    setBusy(true); setErr(null)
+    try {
+      const user = await register(name, username, password, remember)
+      window.location.hash = user.home
+    } catch (ex) {
+      setErr(ex.status === 409 ? 'That username is already taken.' : ex.message || 'Account creation failed.')
     } finally { setBusy(false) }
   }
 
@@ -67,9 +81,14 @@ export default function Login({ theme, toggleTheme }) {
       </section>
 
       <section className="login-card liquid" aria-labelledby="login-title">
-        <h2 id="login-title">Sign in</h2>
-        <p className="muted small">Access is role-based. You'll see the modules your role is cleared for.</p>
-        <form onSubmit={submit} noValidate>
+        <div className="auth-tabs" role="tablist" aria-label="Account access">
+          <button type="button" role="tab" aria-selected={mode === 'login'} onClick={() => { setMode('login'); setErr(null) }}>Sign in</button>
+          <button type="button" role="tab" aria-selected={mode === 'register'} onClick={() => { setMode('register'); setErr(null) }}>Create account</button>
+        </div>
+        <h2 id="login-title">{mode === 'login' ? 'Sign in' : 'Create account'}</h2>
+        <p className="muted small">{mode === 'login' ? "Access is role-based. You'll see the modules your role is cleared for." : 'New accounts start with safe, read-only Viewer access.'}</p>
+        <form onSubmit={mode === 'login' ? submit : signUp} noValidate>
+          {mode === 'register' && <label className="field"><span>Full name</span><input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></label>}
           <label className="field">
             <span>Username</span>
             <input ref={userRef} value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" spellCheck="false" />
@@ -77,13 +96,14 @@ export default function Login({ theme, toggleTheme }) {
           <label className="field">
             <span>Password</span>
             <div className="pw">
-              <input type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+              <input type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
               <button type="button" className="pw-t" onClick={() => setShow(!show)} aria-label={show ? 'Hide password' : 'Show password'}>{show ? 'Hide' : 'Show'}</button>
             </div>
           </label>
           <label className="chk"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> Keep me signed in on this device</label>
           {err && <div className="login-err" role="alert">{err}</div>}
-          <button className="btn primary block" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+          {mode === 'register' && <div className="password-hint">At least 10 characters with a letter and number.</div>}
+          <button className="btn primary block" disabled={busy}>{busy ? (mode === 'login' ? 'Signing in…' : 'Creating…') : (mode === 'login' ? 'Sign in' : 'Create viewer account')}</button>
         </form>
 
         {demo.length > 0 && (

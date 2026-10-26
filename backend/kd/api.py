@@ -121,6 +121,10 @@ class Login(BaseModel):
     password: str
 
 
+class Registration(Login):
+    name: str
+
+
 def _ip(request):
     return request.client.host if request.client else "?"
 
@@ -128,6 +132,11 @@ def _ip(request):
 @app.post("/api/auth/login")
 def login(body: Login, request: Request):
     return auth.login(body.username, body.password, _ip(request))
+
+
+@app.post("/api/auth/register", status_code=201)
+def register(body: Registration, request: Request):
+    return auth.register(body.username, body.name, body.password, _ip(request))
 
 
 @app.get("/api/auth/me")
