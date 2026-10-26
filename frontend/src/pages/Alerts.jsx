@@ -34,6 +34,7 @@ export default function Alerts() {
                          ...['high', 'medium', 'info'].map((v) => ({ value: v, label: v[0].toUpperCase() + v.slice(1), group: 'Severity' })),
                          ...cats.map((c) => ({ value: c, label: c, group: 'Category' }))]} />} pad={false}>
           <ul className="alist big">
+            {!list.length && <li><div className="grow"><b>No verified live alerts</b><div className="muted small">{a.data.operational_status?.message || 'No active alerts from authenticated data sources.'}</div><div className="muted small">Alerts will appear only after all required mine telemetry streams are connected and current.</div></div></li>}
             {list.map((x) => (
               <li key={x.alert_id} className={x.status === 'acknowledged' ? 'acked' : ''}>
                 <Sev s={x.severity} />

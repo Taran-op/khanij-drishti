@@ -9,11 +9,18 @@ from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
 
-from . import notify, shortfall, storage
+from . import ingest, notify, shortfall, storage
 from .config import AS_OF, FESTIVALS, MINES
 
 def generate():
     now = datetime.now().isoformat(timespec="seconds")
+    reality = ingest.operational_reality()
+    if not reality["available"]:
+        empty = pd.DataFrame(columns=["alert_id", "ts", "severity", "category", "ref", "title", "message",
+                                            "recommended_action", "audience", "status"])
+        storage.write_table("alerts", empty)
+        storage.log_run(5, "alerts", total=0, high=0, suppressed="no verified mine telemetry")
+        return []
     hist = storage.read_table("production_daily")
     fc = storage.read_table("weather_forecast")
     alerts = []

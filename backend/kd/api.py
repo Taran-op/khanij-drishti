@@ -212,9 +212,12 @@ def health():
             rc, sc = _card("reserve"), _card("shortfall")
             z = storage.read_table("reserve_zones")
             prov = storage.read_table("provenance")
+            reality = ingest.operational_reality()
             out["headline"] = dict(zones=int(len(z)), new_zones=int((z.status == "new").sum()),
                                    reserve_model=rc.get("champion"), gen_score=next((b["gen_score"] for b in rc.get("leaderboard", []) if b.get("champion")), None),
-                                   occ_auc=rc.get("occurrence_check", {}).get("auc"), mape=sc["backtest"]["model_mape_30d"],
+                                   occ_auc=rc.get("occurrence_check", {}).get("auc"),
+                                   mape=sc["backtest"]["model_mape_30d"] if reality["available"] else None,
+                                   operations_live=reality["available"], operational_status=reality,
                                    real_feeds=int(prov.real.astype(bool).sum()), feeds=int(len(prov)))
         except Exception:  # noqa: BLE001 — health must never fail on a missing card
             pass
@@ -223,6 +226,14 @@ def health():
 
 @app.get("/api/overview")
 def overview(user=Depends(require("overview"))):
+    reality = ingest.operational_reality()
+    if not reality["available"]:
+        zones = storage.read_table("reserve_zones")
+        new = zones[zones.status == "new"]
+        return dict(as_of=str(AS_OF), month=str(AS_OF)[:7], operational_data_available=False,
+                    operational_status=reality,
+                    kpis=dict(new_zones=int(len(new)), new_zones_high=int((new.priority == "High").sum()),
+                              open_alerts=0, high_alerts=0), mines=[], fy=None)
     fcs = {m["id"]: shortfall.forecast(m["id"]) for m in MINES}
     fy = shortfall.fiscal_summary()
     zones = storage.read_table("reserve_zones")
@@ -232,7 +243,8 @@ def overview(user=Depends(require("overview"))):
     tot_proj = sum(v["projected_t"] for v in month.values())
     new = zones[zones.status == "new"]
     return dict(
-        as_of=str(AS_OF), month=str(AS_OF)[:7], fy=fy,
+        as_of=str(AS_OF), month=str(AS_OF)[:7], fy=fy, operational_data_available=True,
+        operational_status=reality,
         kpis=dict(
             month_target_t=tot_target, month_projected_t=tot_proj, month_mtd_t=sum(v["mtd_actual_t"] for v in month.values()),
             month_gap_t=tot_target - tot_proj,
@@ -322,12 +334,18 @@ def mines():
 @app.get("/api/production/{mine_id}", dependencies=[Depends(require("production"))])
 def production(mine_id: str, days: int = 120):
     _check(mine_id)
+    reality = ingest.operational_reality()
+    if not reality["available"]:
+        raise HTTPException(503, detail=reality)
     return dict(mine=MINE_BY_ID[mine_id], history=shortfall.history(mine_id, days),
                 forecast=shortfall.forecast(mine_id), drivers=shortfall.drivers(mine_id))
 
 
 @app.get("/api/forecast", dependencies=[Depends(require("production"))])
 def forecast_all():
+    reality = ingest.operational_reality()
+    if not reality["available"]:
+        raise HTTPException(503, detail=reality)
     return dict(as_of=str(AS_OF), horizon_days=HORIZON_DAYS, model=_card("shortfall"),
                 mines={m["id"]: shortfall.forecast(m["id"]) for m in MINES})
 
@@ -368,10 +386,13 @@ def actions():
 # ---- alerts, reports, system -----------------------------------------------------------------
 @app.get("/api/alerts")
 def get_alerts(user=Depends(require("alerts"))):
+    reality = ingest.operational_reality()
+    if not reality["available"]:
+        return dict(alerts=[], notifications=[], operational_status=reality, real_time=False)
     al = _visible_alerts(user)
     ids = set(al.alert_id)
     notes = [m for m in notify_outbox(user)["messages"] if m["kind"] != "alert" or m["ref"] in ids]
-    return dict(alerts=al.to_dict("records"), notifications=notes[:100])
+    return dict(alerts=al.to_dict("records"), notifications=notes[:100], operational_status=reality, real_time=True)
 
 
 @app.post("/api/alerts/{alert_id}/ack")

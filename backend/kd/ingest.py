@@ -239,6 +239,32 @@ def status():
         )
 
 
+def operational_reality():
+    """Return whether every operational stream has verified, non-simulator records.
+
+    Public/open datasets can support geology and weather, but production forecasts and alerts
+    are only operationally real when all five mine streams come from external devices/uploads.
+    """
+    init()
+    streams = ("production_shift", "equipment_daily", "blasting", "manpower", "plan")
+    detail = {}
+    with _con() as c:
+        for table_name in streams:
+            date_col = "month" if table_name == "plan" else "date"
+            row = c.execute(
+                f"SELECT COUNT(*) AS n, MAX({date_col}) AS latest FROM {table_name} "
+                "WHERE source <> 'virtual-mine' AND source NOT LIKE 'vm-%'"
+            ).fetchone()
+            detail[table_name] = dict(records=int(row["n"]), latest=row["latest"])
+    missing = [name for name, item in detail.items() if not item["records"]]
+    latest = detail["production_shift"]["latest"]
+    stale = not latest or latest < str(date.today() - timedelta(days=2))
+    return dict(available=not missing and not stale, real_time=not missing and not stale,
+                latest_production=latest, missing_streams=missing, stale=stale, streams=detail,
+                message=("Verified mine telemetry is live." if not missing and not stale else
+                         "Awaiting authenticated mine telemetry; simulated operational data is hidden."))
+
+
 def live_equipment(minutes=30):
     """Latest heartbeat per machine within the window."""
     init()

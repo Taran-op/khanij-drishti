@@ -73,7 +73,7 @@ export default function Login({ theme, toggleTheme }) {
         <ul className="hero-pills">
           <li className="liquid"><b>{hl ? hl.zones : '—'}</b><span>probable reserve zones{hl ? ` (${hl.new_zones} greenfield)` : ''}</span></li>
           <li className="liquid"><b>{hl?.occ_auc ?? '—'}</b><span>AUC on held-out USGS occurrences</span></li>
-          <li className="liquid"><b>{hl ? `${hl.real_feeds}/${hl.feeds}` : '—'}</b><span>data feeds from real sources</span></li>
+          <li className="liquid"><b>{hl ? `${hl.real_feeds}/${hl.feeds}` : '—'}</b><span>verified real-source feeds</span></li>
         </ul>
         <div className="hero-layers">
           {['Sentinel-1/2', 'Copernicus DEM', 'MODIS LST', 'EMAG2 magnetics', 'Macrostrat geology', 'USGS MRDS', 'ERA5 weather', 'Mine telemetry API'].map((x) => <span key={x}>{x}</span>)}

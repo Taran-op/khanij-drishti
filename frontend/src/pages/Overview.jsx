@@ -6,7 +6,7 @@ import { api, useApi } from '../api'
 import { useAuth } from '../auth'
 import GisMap from '../components/GisMap'
 import { ChartDefs, GlassTooltip, axisTick, useChartId } from '../components/ChartKit'
-import { ErrorBox, Kpi, Loading, RiskBadge, Sev } from '../components/ui'
+import { Card, ErrorBox, Kpi, Loading, RiskBadge, Sev } from '../components/ui'
 import { kt, n0, n1, pct, t } from '../format'
 
 const ICON = {
@@ -102,6 +102,17 @@ export default function Overview() {
 
   if (ov.error) return <ErrorBox error={ov.error} retry={ov.reload} />
   if (!ov.data) return <Loading label="Running forecasts" />
+  if (!ov.data.operational_data_available) return (
+    <div className="page">
+      <div className="page-h"><div><h1>Command Center</h1><p className="muted">Welcome, {user.name.replace(/\s*\(.*\)/, '')} · verified data only</p></div></div>
+      <Card title="Awaiting authenticated mine telemetry" sub="Synthetic production, targets, forecasts and alerts have been removed from this deployment.">
+        <p>{ov.data.operational_status?.message}</p>
+        <p className="muted small">Missing streams: {(ov.data.operational_status?.missing_streams || []).join(', ') || 'none'} · latest verified production: {ov.data.operational_status?.latest_production || 'none'}</p>
+        <div className="row gap wrap">{can('reserves') && <Link className="btn primary" to="/reserves">Open real-source GIS viewer</Link>}<Link className="btn" to="/alerts">View alert status</Link></div>
+      </Card>
+      <div className="kpis"><Kpi label="Real-source probable zones" value={ov.data.kpis.new_zones} sub={`${ov.data.kpis.new_zones_high} high priority`} tone="violet" /><Kpi label="Verified operational alerts" value="0" sub="No live mine feed connected" tone="blue" /></div>
+    </div>
+  )
   const { kpis: k, fy } = ov.data
   const fyPct = k.fy_projected_t / k.fy_target_t
   const highAlerts = (al.data?.alerts || []).filter((a) => a.severity === 'high' && a.status === 'open').length

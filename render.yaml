@@ -32,6 +32,8 @@ services:
         value: https://khanijsetu-app.vercel.app,https://frontend-one-theta-32.vercel.app
       - key: KD_DEMO_LOGIN
         value: "0"
+      - key: KD_REAL_ONLY
+        value: "1"
       - key: KD_WORKER
         value: inprocess
       - key: KD_SCHEDULER
